@@ -20,8 +20,9 @@ class AVLNode(object):
         self.left = None
         self.right = None
         self.parent = None
-        self.height = -1  # Balance factor
+        self.height = -1
         self.size = -1
+        self.bf = 0
 
     """returns the left child
     @rtype: AVLNode
@@ -164,16 +165,16 @@ class AVLTreeList(object):
     """
 
     def retrieve(self, i):
-        return self.retrieve_rec(self.root, i)
+        return self.retrieve_node_rec(self.root, i).value
 
-    def retrieve_rec(self, node, i):
+    def retrieve_node_rec(self, node, i):
         if node.left.size > i:
-            return self.retrieve_rec(node.left, i)
+            return self.retrieve_node_rec(node.left, i)
 
         elif node.left.size < i:
-            return self.retrieve_rec(node.right, i - node.left.size)
+            return self.retrieve_node_rec(node.right, i - node.left.size)
         else:
-            return node.value
+            return node
 
     """inserts val at position i in the list
 
@@ -187,7 +188,26 @@ class AVLTreeList(object):
     """
 
     def insert(self, i, val):
-        return -1
+        pass
+        # new_node = AVLNode(val)
+        # new_node.setSize(1)
+        # if self.size == 0:
+        #     new_node.setLeft(AVLNode(None))
+        #     new_node.setRight(AVLNode(None))
+        #     new_node.setHeight(0)
+        #     self.root = new_node
+        #     return 0
+        # if self.size == i:
+        #     prev_node = self.retrieve_node_rec(self.root, self.size - 1)
+        #     prev_node.right = new_node
+        # else:
+        #     prev_node = self.retrieve_node_rec(self.root, i)
+        #     if not prev_node.left.isRealNode():
+        #         prev_node.left = new_node
+        #         prev_node.size += 1
+        #
+        #
+        # return -1
 
     """deletes the i'th item in the list
 
@@ -249,7 +269,22 @@ class AVLTreeList(object):
     """
 
     def sort(self):
-        return None
+        values_list = []
+        self.sort_rec(self.root, values_list)  # todo: sort_rec is exactly listToArray
+        sorted_values = sorted(values_list)
+        sorted_tree = AVLTreeList()
+        for i in range(len(values_list)):
+            sorted_tree.insert(i, sorted_values[i])
+        return sorted_tree
+
+    def sort_rec(self, root, values_list):
+        if root.left.isRealNode():
+            self.sort_rec(root.left, values_list)
+
+        values_list.append(root.value)
+
+        if root.right.isRealNode():
+            self.sort_rec(root.right, values_list)
 
     """permute the info values of the list 
 
@@ -280,7 +315,26 @@ class AVLTreeList(object):
     """
 
     def search(self, val):
-        return None
+        counter = [-1]
+        i = self.search_rec(self.root, val, counter)
+        return i
+
+    def search_rec(self, root, val, counter):
+        if root.left.isRealNode():
+            i = self.search_rec(root.left, val, counter)
+            if i != -1:
+                return i
+
+        counter[0] = counter[0] + 1
+
+        if root.value == val:
+            return counter[0]
+        else:
+            if root.right.isRealNode():
+                i = self.search_rec(root.right, val, counter)
+                if i != -1:
+                    return i
+        return -1
 
     """returns the root of the tree representing the list
 
