@@ -3,7 +3,7 @@
 # name1    - complete info
 # id2      - complete info
 # name2    - complete info
-
+# todo: return the part above to the conventions of the beginning and fill it
 
 """A class represnting a node in an AVL tree"""
 
@@ -21,6 +21,7 @@ class AVLNode(object):
         self.right = None
         self.parent = None
         self.height = -1  # Balance factor
+        self.size = -1
 
     """returns the left child
     @rtype: AVLNode
@@ -28,7 +29,7 @@ class AVLNode(object):
     """
 
     def getLeft(self):
-        return None
+        return self.left
 
     """returns the right child
 
@@ -37,7 +38,7 @@ class AVLNode(object):
     """
 
     def getRight(self):
-        return None
+        return self.right
 
     """returns the parent 
 
@@ -46,7 +47,7 @@ class AVLNode(object):
     """
 
     def getParent(self):
-        return None
+        return self.parent
 
     """return the value
 
@@ -55,7 +56,7 @@ class AVLNode(object):
     """
 
     def getValue(self):
-        return None
+        return self.value
 
     """returns the height
 
@@ -64,7 +65,10 @@ class AVLNode(object):
     """
 
     def getHeight(self):
-        return -1
+        return self.height
+
+    def getSize(self):
+        return self.size
 
     """sets left child
 
@@ -73,7 +77,7 @@ class AVLNode(object):
     """
 
     def setLeft(self, node):
-        return None
+        self.left = node
 
     """sets right child
 
@@ -82,7 +86,7 @@ class AVLNode(object):
     """
 
     def setRight(self, node):
-        return None
+        self.right = node
 
     """sets parent
 
@@ -91,7 +95,7 @@ class AVLNode(object):
     """
 
     def setParent(self, node):
-        return None
+        self.parent = node
 
     """sets value
 
@@ -100,7 +104,7 @@ class AVLNode(object):
     """
 
     def setValue(self, value):
-        return None
+        self.value = value
 
     """sets the balance factor of the node
 
@@ -109,7 +113,10 @@ class AVLNode(object):
     """
 
     def setHeight(self, h):
-        return None
+        self.height = h
+
+    def setSize(self, s):
+        self.size = s
 
     """returns whether self is not a virtual node 
 
@@ -118,7 +125,7 @@ class AVLNode(object):
     """
 
     def isRealNode(self):
-        return False
+        return self.value is not None
 
 
 """
@@ -157,7 +164,16 @@ class AVLTreeList(object):
     """
 
     def retrieve(self, i):
-        return None
+        return self.retrieve_rec(self.root, i)
+
+    def retrieve_rec(self, node, i):
+        if node.left.size + 1 > i:
+            return self.retrieve_rec(node.left, i)
+
+        elif node.left.size + 1 < i:
+            return self.retrieve_rec(node.right, i - node.left.size - 1)
+        else:
+            return node.value
 
     """inserts val at position i in the list
 
@@ -192,6 +208,11 @@ class AVLTreeList(object):
     """
 
     def first(self):
+        if not self.empty():
+            first_node = self.root
+            while first_node.left.isRealNode():
+                first_node = first_node.left
+            return first_node.value
         return None
 
     """returns the value of the last item in the list
