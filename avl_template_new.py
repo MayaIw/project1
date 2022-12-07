@@ -167,11 +167,11 @@ class AVLTreeList(object):
         return self.retrieve_rec(self.root, i)
 
     def retrieve_rec(self, node, i):
-        if node.left.size + 1 > i:
+        if node.left.size > i:
             return self.retrieve_rec(node.left, i)
 
-        elif node.left.size + 1 < i:
-            return self.retrieve_rec(node.right, i - node.left.size - 1)
+        elif node.left.size < i:
+            return self.retrieve_rec(node.right, i - node.left.size)
         else:
             return node.value
 
