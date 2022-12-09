@@ -6,6 +6,8 @@
 # todo: return the part above to the conventions of the beginning and fill it
 
 """A class represnting a node in an AVL tree"""
+import math
+import random
 
 
 class AVLNode(object):
@@ -153,7 +155,7 @@ class AVLTreeList(object):
     """
 
     def empty(self):
-        return None
+        return self.size == 0
 
     """retrieves the value of the i'th item in the list
 
@@ -175,6 +177,78 @@ class AVLTreeList(object):
             return self.retrieve_node_rec(node.right, i - node.left.size)
         else:
             return node
+
+    """right rotation
+    A is B's left child
+    before rotation: B.BF = +2, A.BF = +1 or 0
+    after rotation: B.BF = 0, A.BF = 0"""
+
+    def right_rotate(self, A, B):
+        B.setLeft(A.right)
+        B.left.setParent(B)
+        A.setRight(B)
+        A.setParent(B.parent)
+        if A.parent.right is B:
+            A.parent.setRight(A)
+        else:
+            A.parent.setLeft(A)
+        B.setParent(A)
+
+    """left rotation
+    A is B's right child
+    before rotation: B.BF = -2, A.BF = -1 or 0
+    after rotation: B.BF = 0, A.BF = 0"""
+
+    def left_rotate(self, A, B):
+        B.setRight(A.left)
+        B.right.setParent(B)
+        A.setLeft(B)
+        A.setParent(B.parent)
+        if A.parent.right is B:
+            A.parent.setRight(A)
+        else:
+            A.parent.setLeft(A)
+        B.setParent(A)
+
+    """left then right rotation
+    A is C's left child
+    B is A's right child
+    before rotation: C.BF = +2, A.BF = -1 
+    after rotation: C.BF = 0, A.BF = 0"""
+
+    def left_right_rotate(self, A, B, C):
+        A.setRight(B.left)
+        A.right.setParent(A)
+        B.setLeft(A)
+        C.setLeft(B.right)
+        C.left.setParent(C)
+        B.setParent(C.parent)
+        if C.parent.right is C:
+            C.parent.setRight(B)
+        else:
+            C.parent.setLeft(B)
+        A.setParent(B)
+        C.setParent(B)
+
+    """right then left rotation
+       A is C's right child
+       B is A's left child
+       before rotation: C.BF = -2, A.BF = +1 
+       after rotation: C.BF = 0, A.BF = 0"""
+
+    def right_left_rotate(self, A, B, C):
+        A.left = B.right
+        A.left.setParent(A)
+        B.right = A
+        C.right = B.left
+        C.right.setParent(C)
+        B.setParent(C.parent)
+        if C.parent.right is C:
+            C.parent.setRight(B)
+        else:
+            C.parent.setLeft(B)
+        A.setParent(B)
+        C.setParent(B)
 
     """inserts val at position i in the list
 
@@ -235,8 +309,44 @@ class AVLTreeList(object):
     @returns: the number of rebalancing operation due to AVL rebalancing
     """
 
-    def delete(self, i):
-        return -1
+    # def delete(self, i):
+    #   if self.empty(self):
+    #        return -1
+    #    to_remove = self.retrieve_node_rec(self, i)
+    #    if self.is_leaf(to_remove):
+    #        self.remove(to_remove)
+
+    """removes a leaf"""
+
+    # def remove(self, node):
+    #    to_remove = node
+    #    if to_remove.getParent() is None:
+    #        to_remove = AVLNode(None)
+    #    else:
+    #       parent = to_remove.getParent()
+    #        if parent.right == to_remove:
+    #            parent.setRight(AVLNode(None))
+    #        else:
+    #            parent.setLeft(AVLNode(None))
+
+        # Need to update the fields upwards.
+
+    """returns the successor of a given node"""
+
+    def successor(self, node):
+        if node.right is not None:
+            return node.right.first()
+        y = node.getParent()
+        while y is not None and node == y.right:
+            node = y
+            y = node.getParent()
+        return y
+
+    """returns if a node is a leaf"""
+
+    def is_leaf(self, node):
+        if node.right.value is None and node.left.value is None:
+            return True
 
     """returns the value of the first item in the list
 
@@ -252,6 +362,12 @@ class AVLTreeList(object):
             return first_node.value
         return None
 
+    # def first(self):
+    #   return self.retrieve(self,0)
+
+    # def last(self):
+    #   return self.retrieve(self, self.root.size-1)
+
     """returns the value of the last item in the list
 
     @rtype: str
@@ -259,6 +375,11 @@ class AVLTreeList(object):
     """
 
     def last(self):
+        if not self.empty():
+            first_node = self.root
+            while first_node.right.isRealNode():
+                first_node = first_node.right
+            return first_node.value
         return None
 
     """returns an array representing list 
@@ -268,7 +389,9 @@ class AVLTreeList(object):
     """
 
     def listToArray(self):
-        return None
+        values_list = []
+        self.sort_rec(self.root, values_list)
+        return values_list
 
     """returns the size of the list 
 
@@ -277,7 +400,7 @@ class AVLTreeList(object):
     """
 
     def length(self):
-        return None
+        return self.root.size
 
     """sort the info values of the list
 
@@ -310,7 +433,20 @@ class AVLTreeList(object):
     """
 
     def permutation(self):
-        return None
+        values = self.listToArray()
+        random.shuffle(values)
+        n = self.size
+        tmp_tree = AVLTreeList
+        tmp_tree.build_tree_rec(values, n)
+        self = tmp_tree
+
+    """builds an AVL tree recursively from a given array"""
+
+    def build_tree_rec(self, arr, n):
+        m = math.floor(n / 2)
+        self.root = AVLNode(arr(m))
+        self.root.right.build_tree_rec(arr[0:m], m)  # builds an AVL tree from the right half
+        self.root.left.build_tree_rec(arr[m + 1:n], n - m)  # builds an AVL tree from the left half
 
     """concatenates lst to self
 
@@ -360,4 +496,4 @@ class AVLTreeList(object):
     """
 
     def getRoot(self):
-        return None
+        return self.root
