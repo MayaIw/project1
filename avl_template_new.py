@@ -6,6 +6,7 @@
 # todo: return the part above to the conventions of the beginning and fill it
 
 """A class represnting a node in an AVL tree"""
+import math
 import random
 
 
@@ -292,25 +293,37 @@ class AVLTreeList(object):
     """
 
     # def delete(self, i):
-    #    if self.empty(self):
+    #   if self.empty(self):
     #        return -1
     #    to_remove = self.retrieve_node_rec(self, i)
     #    if self.is_leaf(to_remove):
+    #        self.remove(to_remove)
 
     """removes a leaf"""
 
     # def remove(self, node):
-    #    removed = node
-    #    node = removed.getParent()
-    #   if node.right == removed:
-    #       node.setRight(AVLNode(None))
-        # Need to make sure that parent exists. Then update the fields upwards.
+    #    to_remove = node
+    #    if to_remove.getParent() is None:
+    #        to_remove = AVLNode(None)
+    #    else:
+    #       parent = to_remove.getParent()
+    #        if parent.right == to_remove:
+    #            parent.setRight(AVLNode(None))
+    #        else:
+    #            parent.setLeft(AVLNode(None))
+
+        # Need to update the fields upwards.
 
     """returns the successor of a given node"""
 
     def successor(self, node):
         if node.right is not None:
             return node.right.first()
+        y = node.getParent()
+        while y is not None and node == y.right:
+            node = y
+            y = node.getParent()
+        return y
 
     """returns if a node is a leaf"""
 
@@ -403,13 +416,20 @@ class AVLTreeList(object):
     """
 
     def permutation(self):
-        values = self.listToArray(self)
+        values = self.listToArray()
         random.shuffle(values)
-        tmp_tree = AVLTreeList()
-        n = tmp_tree.size
-        for i in range(n):
-            tmp_tree.insert(tmp_tree, i, values[i])
+        n = self.size
+        tmp_tree = AVLTreeList
+        tmp_tree.build_tree_rec(values, n)
         self = tmp_tree
+
+    """builds an AVL tree recursively from a given array"""
+
+    def build_tree_rec(self, arr, n):
+        m = math.floor(n / 2)
+        self.root = AVLNode(arr(m))
+        self.root.right.build_tree_rec(arr[0:m], m)  # builds an AVL tree from the right half
+        self.root.left.build_tree_rec(arr[m + 1:n], n - m)  # builds an AVL tree from the left half
 
     """concatenates lst to self
 
