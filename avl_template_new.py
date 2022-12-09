@@ -188,26 +188,43 @@ class AVLTreeList(object):
     """
 
     def insert(self, i, val):
-        pass
-        # new_node = AVLNode(val)
-        # new_node.setSize(1)
-        # if self.size == 0:
-        #     new_node.setLeft(AVLNode(None))
-        #     new_node.setRight(AVLNode(None))
-        #     new_node.setHeight(0)
-        #     self.root = new_node
-        #     return 0
-        # if self.size == i:
-        #     prev_node = self.retrieve_node_rec(self.root, self.size - 1)
-        #     prev_node.right = new_node
-        # else:
-        #     prev_node = self.retrieve_node_rec(self.root, i)
-        #     if not prev_node.left.isRealNode():
-        #         prev_node.left = new_node
-        #         prev_node.size += 1
-        #
-        #
-        # return -1
+        r_counter = 0
+
+        new_node = AVLNode(val)
+        new_node.setSize(1)
+
+        if self.size == 0:
+            new_node.setLeft(AVLNode(None))
+            new_node.setRight(AVLNode(None))
+            new_node.setHeight(0)
+            self.root = new_node
+            return r_counter
+
+        if self.size == i:
+            prev_node = self.retrieve_node_rec(self.root, self.size - 1)
+            prev_node.right = new_node
+        else:
+            prev_node = self.retrieve_node_rec(self.root, i)
+            if not prev_node.left.isRealNode():
+                prev_node.left = new_node
+            else:
+                prev_node = self.retrieve_node_rec(self.root, i - 1)
+                prev_node.right = new_node
+
+        new_node.setParent(prev_node)
+
+        while new_node.getParent() is not None:
+            prev_height = prev_node.getHeight()
+            prev_node.setHeight(min(prev_node.left.getHeight(), prev_node.right.getHeight()) + 1)
+            if (prev_node.getHeight() == prev_height) and (
+                    -2 < prev_node.left.getHeight() - prev_node.right.getHeight() < 2):
+                return r_counter
+
+
+
+            r_counter += 1
+
+        return -1
 
     """deletes the i'th item in the list
 
