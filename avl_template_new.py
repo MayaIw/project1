@@ -24,7 +24,6 @@ class AVLNode(object):
         self.parent = None
         self.height = -1
         self.size = -1
-        self.bf = 0
 
     """returns the left child
     @rtype: AVLNode
@@ -129,6 +128,9 @@ class AVLNode(object):
 
     def isRealNode(self):
         return self.value is not None
+
+    def getBF(self):
+        return self.left.height - self.right.height
 
 
 """
@@ -287,18 +289,33 @@ class AVLTreeList(object):
 
         new_node.setParent(prev_node)
 
-        while new_node.getParent() is not None:
+        while prev_node is not None:
             prev_height = prev_node.getHeight()
             prev_node.setHeight(min(prev_node.left.getHeight(), prev_node.right.getHeight()) + 1)
-            if (prev_node.getHeight() == prev_height) and (
-                    -2 < prev_node.left.getHeight() - prev_node.right.getHeight() < 2):
-                return r_counter
+            if -2 < prev_node.getBF() < 2:
+                if prev_node.getHeight() == prev_height:
+                    return r_counter
+                else:
+                    prev_node = prev_node.getParent()
+            else:
+                if prev_node.getBF() == -2:
+                    son_bf = prev_node.getRight().getBF()
+                    if son_bf == -1:
+                        self.left_rotate(prev_node.getRight(), prev_node)
+                        r_counter += 1
+                    elif son_bf == 1:
+                        self.right_left_rotate(prev_node.getRight(), prev_node.getRight().getLeft(), prev_node)
+                        r_counter += 2
+                elif prev_node.getBF() == 2:
+                    son_bf = prev_node.getLeft().getBF()
+                    if son_bf == -1:
+                        self.left_right_rotate(prev_node.getLeft(), prev_node.getLeft().getRight(), prev_node)
+                        r_counter += 2
+                    elif son_bf == 1:
+                        self.right_rotate(prev_node.getLeft(), prev_node)
+                        r_counter += 1
 
-
-
-            r_counter += 1
-
-        return -1
+                prev_node = prev_node.getParent().getParent()
 
     """deletes the i'th item in the list
 
@@ -329,7 +346,7 @@ class AVLTreeList(object):
     #        else:
     #            parent.setLeft(AVLNode(None))
 
-        # Need to update the fields upwards.
+    # Need to update the fields upwards.
 
     """returns the successor of a given node"""
 
