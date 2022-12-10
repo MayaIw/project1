@@ -195,6 +195,11 @@ class AVLTreeList(object):
         else:
             A.parent.setLeft(A)
         B.setParent(A)
+        B.height -= 2
+        A.parent.height = max(A.parent.right.height, A.parent.left.height) + 1
+        s = B.size
+        B.size = A.size - 1
+        A.size = s
 
     """left rotation
     A is B's right child
@@ -211,6 +216,11 @@ class AVLTreeList(object):
         else:
             A.parent.setLeft(A)
         B.setParent(A)
+        B.height -= 2
+        A.parent.height = max(A.parent.right.height, A.parent.left.height) + 1
+        s = B.size
+        B.size = A.size - 1
+        A.size = s
 
     """left then right rotation
     A is C's left child
@@ -231,6 +241,13 @@ class AVLTreeList(object):
             C.parent.setLeft(B)
         A.setParent(B)
         C.setParent(B)
+        A.height = B.height
+        B.height = C.height - 1
+        C.height -= 2
+        C.parent.height = max(C.parent.right.height, C.parent.left.height) + 1
+        B.size = C.size
+        A.size = A.left.size + B.right.size + 1
+        C.size = C.right.size + C.left.size + 1
 
     """right then left rotation
        A is C's right child
@@ -251,6 +268,13 @@ class AVLTreeList(object):
             C.parent.setLeft(B)
         A.setParent(B)
         C.setParent(B)
+        A.height = B.height
+        B.height = C.height - 1
+        C.height -= 2
+        C.parent.height = max(C.parent.right.height, C.parent.left.height) + 1
+        B.size = C.size
+        A.size = A.left.size + B.right.size + 1
+        C.size = C.right.size + C.left.size + 1
 
     """inserts val at position i in the list
 
@@ -378,12 +402,6 @@ class AVLTreeList(object):
                 first_node = first_node.left
             return first_node.value
         return None
-
-    # def first(self):
-    #   return self.retrieve(self,0)
-
-    # def last(self):
-    #   return self.retrieve(self, self.root.size-1)
 
     """returns the value of the last item in the list
 
