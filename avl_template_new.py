@@ -295,12 +295,12 @@ class AVLTreeList(object):
                         r_counter += 1
                     elif son_bf == 1:
                         self.right_left_rotate(node.getRight(), node.getRight().getLeft(), node)
-                        r_counter += 1
+                        r_counter += 2
                 elif node.getBF() == 2:
                     son_bf = node.getLeft().getBF()
                     if son_bf == -1:
                         self.left_right_rotate(node.getLeft(), node.getLeft().getRight(), node)
-                        r_counter += 1
+                        r_counter += 2
                     elif son_bf == 1 or son_bf == 0:
                         self.right_rotate(node.getLeft(), node)
                         r_counter += 1
@@ -489,6 +489,44 @@ def length(self):
     return self.root.size
 
 
+""" merging two lists into a sorted list
+        A and B must be sorted. """
+
+
+def merge(A, B):
+    n = len(A)
+    m = len(B)
+    C = [None for i in range(n + m)]
+
+    a = 0
+    b = 0
+    c = 0
+    while a < n and b < m:  # more element in both A and B
+        if A[a] < B[b]:
+            C[c] = A[a]
+            a += 1
+        else:
+            C[c] = B[b]
+            b += 1
+        c += 1
+
+    C[c:] = A[a:] + B[b:]  # append remaining elements (one of those is empty)
+
+    return C
+
+
+""" recursive mergesort """
+
+
+def mergesort(lst):
+    n = len(lst)
+    if n <= 1:
+        return lst
+    else:  # two recursive calls, then merge
+        return merge(mergesort(lst[0:n // 2]),
+                     mergesort(lst[n // 2:n]))
+
+
 """sort the info values of the list
 
 @rtype: list
@@ -498,8 +536,8 @@ def length(self):
 
 def sort(self):
     values_list = []
-    self.sort_rec(self.root, values_list) 
-    sorted_values = sorted(values_list)
+    self.sort_rec(self.root, values_list)
+    sorted_values = mergesort(values_list)
     sorted_tree = AVLTreeList()
     # for i in range(len(values_list)):
     #     sorted_tree.insert(i, sorted_values[i])
@@ -518,6 +556,18 @@ def sort_rec(self, root, values_list):
         self.sort_rec(root.right, values_list)
 
 
+""" shuffles an array of n elements """
+
+
+def arr_shuffle(arr):
+    n = len(arr)
+    for i in range(n - 1):
+        j = random.randrange(i, n)
+        tmp = arr[i]  # exchange arr[i] and arr[j]
+        arr[i] = arr[j]
+        arr[j] = tmp
+
+
 """permute the info values of the list 
 
 @rtype: list
@@ -525,32 +575,28 @@ def sort_rec(self, root, values_list):
 """
 
 
-# def permutation(self):
-#     values = self.listToArray()
-#     random.shuffle(values)
-#     self.switch_tree_vals(values, 0)
+def permutation(self):
+    values = self.listToArray()
+    arr_shuffle(values)
+    n = self.size
+    new_tree = AVLTreeList()
+    new_tree.build_tree_rec(values, n)
+    return new_tree
 
-    def permutation(self):
-        values = self.listToArray()
-        random.shuffle(values)  #todo: shuffle without this function
-        n = self.size
-        new_tree = AVLTreeList()
-        new_tree.build_tree_rec(values, n)
-        return new_tree
 
-    """builds an AVL tree recursively from a given array"""
+"""builds an AVL tree recursively from a given array"""
 
-    def build_tree_rec(self, arr, n):
-        m = math.floor(n / 2)
-        self.root = AVLNode(arr(m))
-        self.root.right.build_tree_rec(arr[0:m], m)  # builds an AVL tree from the right half
-        self.root.left.build_tree_rec(arr[m + 1:n], n - m)  # builds an AVL tree from the left half
+
+def build_tree_rec(self, arr, n):
+    m = n // 2
+    self.root = AVLNode(arr(m))
+    self.root.right.build_tree_rec(arr[0:m], m)  # builds an AVL tree from the right half
+    self.root.left.build_tree_rec(arr[m + 1:n], n - m)  # builds an AVL tree from the left half
 
 
 """switches the values from an AVL tree with the values of a given array
 0<= i < arr.length
 arr.length = self.size"""
-
 
 # def switch_tree_vals(self, arr, i):
 #     if self.root is not None:
