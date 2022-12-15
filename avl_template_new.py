@@ -501,8 +501,10 @@ def sort(self):
     self.sort_rec(self.root, values_list) 
     sorted_values = sorted(values_list)
     sorted_tree = AVLTreeList()
-    for i in range(len(values_list)):
-        sorted_tree.insert(i, sorted_values[i])
+    # for i in range(len(values_list)):
+    #     sorted_tree.insert(i, sorted_values[i])
+    n = len(sorted_values)
+    sorted_tree.build_tree_rec(sorted_values, n)
     return sorted_tree
 
 
@@ -523,10 +525,26 @@ def sort_rec(self, root, values_list):
 """
 
 
-def permutation(self):
-    values = self.listToArray()
-    random.shuffle(values)
-    self.switch_tree_vals(values, 0)
+# def permutation(self):
+#     values = self.listToArray()
+#     random.shuffle(values)
+#     self.switch_tree_vals(values, 0)
+
+    def permutation(self):
+        values = self.listToArray()
+        random.shuffle(values)  #todo: shuffle without this function
+        n = self.size
+        new_tree = AVLTreeList()
+        new_tree.build_tree_rec(values, n)
+        return new_tree
+
+    """builds an AVL tree recursively from a given array"""
+
+    def build_tree_rec(self, arr, n):
+        m = math.floor(n / 2)
+        self.root = AVLNode(arr(m))
+        self.root.right.build_tree_rec(arr[0:m], m)  # builds an AVL tree from the right half
+        self.root.left.build_tree_rec(arr[m + 1:n], n - m)  # builds an AVL tree from the left half
 
 
 """switches the values from an AVL tree with the values of a given array
@@ -534,11 +552,11 @@ def permutation(self):
 arr.length = self.size"""
 
 
-def switch_tree_vals(self, arr, i):
-    if self.root is not None:
-        switch_tree_vals(self.root.getRight(), arr, i + 1)
-        self.root.setValue(arr(i))
-        switch_tree_vals(self.root.getLeft(), arr, i + 1)
+# def switch_tree_vals(self, arr, i):
+#     if self.root is not None:
+#         switch_tree_vals(self.root.getRight(), arr, i + 1)
+#         self.root.setValue(arr(i))
+#         switch_tree_vals(self.root.getLeft(), arr, i + 1)
 
 
 """concatenates lst to self
