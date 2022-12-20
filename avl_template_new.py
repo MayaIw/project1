@@ -419,74 +419,172 @@ class AVLTreeList(object):
         if B is not None:
             B.setParent(A.getParent())
 
+    """returns the successor of a given node"""
 
-"""returns the successor of a given node"""
-
-
-def successor(self, node):
-    if node.right is not None:
-        return node.right.first()
-    y = node.getParent()
-    while y is not None and node == y.right:
-        node = y
+    def successor(self, node):
+        if node.right is not None:
+            return node.right.first()
         y = node.getParent()
-    return y
+        while y is not None and node == y.right:
+            node = y
+            y = node.getParent()
+        return y
 
+    """returns the value of the first item in the list
+    
+    @rtype: str
+    @returns: the value of the first item, None if the list is empty
+    """
 
-"""returns the value of the first item in the list
+    def first(self):
+        if not self.empty():
+            first_node = self.root
+            while first_node.left.isRealNode():
+                first_node = first_node.left
+            return first_node.value
+        return None
 
-@rtype: str
-@returns: the value of the first item, None if the list is empty
-"""
+    """returns the value of the last item in the list
+    
+    @rtype: str
+    @returns: the value of the last item, None if the list is empty
+    """
 
+    def last(self):
+        if not self.empty():
+            first_node = self.root
+            while first_node.right.isRealNode():
+                first_node = first_node.right
+            return first_node.value
+        return None
 
-def first(self):
-    if not self.empty():
-        first_node = self.root
-        while first_node.left.isRealNode():
-            first_node = first_node.left
-        return first_node.value
-    return None
+    """returns an array representing list 
+    
+    @rtype: list
+    @returns: a list of strings representing the data structure
+    """
 
+    def listToArray(self):
+        values_list = []
+        self.sort_rec(self.root, values_list)
+        return values_list
 
-"""returns the value of the last item in the list
+    """returns the size of the list 
+    
+    @rtype: int
+    @returns: the size of the list
+    """
 
-@rtype: str
-@returns: the value of the last item, None if the list is empty
-"""
+    def length(self):
+        return self.root.size
 
+    """sort the info values of the list
+    
+    @rtype: list
+    @returns: an AVLTreeList where the values are sorted by the info of the original list.
+    """
 
-def last(self):
-    if not self.empty():
-        first_node = self.root
-        while first_node.right.isRealNode():
-            first_node = first_node.right
-        return first_node.value
-    return None
+    def sort(self):
+        values_list = []
+        self.sort_rec(self.root, values_list)
+        sorted_values = mergesort(values_list)
+        sorted_tree = AVLTreeList()
+        # for i in range(len(values_list)):
+        #     sorted_tree.insert(i, sorted_values[i])
+        n = len(sorted_values)
+        sorted_tree.build_tree_rec(sorted_values, n)
+        return sorted_tree
 
+    def sort_rec(self, root, values_list):
+        if root.left.isRealNode():
+            self.sort_rec(root.left, values_list)
 
-"""returns an array representing list 
+        values_list.append(root.value)
 
-@rtype: list
-@returns: a list of strings representing the data structure
-"""
+        if root.right.isRealNode():
+            self.sort_rec(root.right, values_list)
 
+    """permute the info values of the list 
+    
+    @rtype: list
+    @returns: an AVLTreeList where the values are permuted randomly by the info of the original list. ##Use Randomness
+    """
 
-def listToArray(self):
-    values_list = []
-    self.sort_rec(self.root, values_list)
-    return values_list
+    def permutation(self):
+        values = self.listToArray()
+        arr_shuffle(values)
+        n = self.size
+        new_tree = AVLTreeList()
+        new_tree.build_tree_rec(values, n)
+        return new_tree
 
+    """builds an AVL tree recursively from a given array"""
 
-"""returns the size of the list 
+    def build_tree_rec(self, arr, n):
+        m = n // 2
+        self.root = AVLNode(arr(m))
+        self.root.right.build_tree_rec(arr[0:m], m)  # builds an AVL tree from the right half
+        self.root.left.build_tree_rec(arr[m + 1:n], n - m)  # builds an AVL tree from the left half
 
-@rtype: int
-@returns: the size of the list
-"""
+    """switches the values from an AVL tree with the values of a given array
+    0<= i < arr.length
+    arr.length = self.size"""
 
+    # def switch_tree_vals(self, arr, i):
+    #     if self.root is not None:
+    #         switch_tree_vals(self.root.getRight(), arr, i + 1)
+    #         self.root.setValue(arr(i))
+    #         switch_tree_vals(self.root.getLeft(), arr, i + 1)
 
-def length(self):
-    return self.root.size
+    """concatenates lst to self
+    
+    @type lst: AVLTreeList
+    @param lst: a list to be concatenated after self
+    @rtype: int
+    @returns: the absolute value of the difference between the height of the AVL trees joined
+    """
+
+    def concat(self, lst):
+        return None
+
+    """searches for a *value* in the list
+    
+    @type val: str
+    @param val: a value to be searched
+    @rtype: int
+    @returns: the first index that contains val, -1 if not found.
+    """
+
+    def search(self, val):
+        counter = [-1]
+        i = self.search_rec(self.root, val, counter)
+        return i
+
+    def search_rec(self, root, val, counter):
+        if root.left.isRealNode():
+            i = self.search_rec(root.left, val, counter)
+            if i != -1:
+                return i
+
+        counter[0] = counter[0] + 1
+
+        if root.value == val:
+            return counter[0]
+        else:
+            if root.right.isRealNode():
+                i = self.search_rec(root.right, val, counter)
+                if i != -1:
+                    return i
+        return -1
+
+    """returns the root of the tree representing the list
+    
+    @rtype: AVLNode
+    @returns: the root, None if the list is empty
+    """
+
+    def getRoot(self):
+        return self.root
 
 
 """ merging two lists into a sorted list
@@ -527,35 +625,6 @@ def mergesort(lst):
                      mergesort(lst[n // 2:n]))
 
 
-"""sort the info values of the list
-
-@rtype: list
-@returns: an AVLTreeList where the values are sorted by the info of the original list.
-"""
-
-
-def sort(self):
-    values_list = []
-    self.sort_rec(self.root, values_list)
-    sorted_values = mergesort(values_list)
-    sorted_tree = AVLTreeList()
-    # for i in range(len(values_list)):
-    #     sorted_tree.insert(i, sorted_values[i])
-    n = len(sorted_values)
-    sorted_tree.build_tree_rec(sorted_values, n)
-    return sorted_tree
-
-
-def sort_rec(self, root, values_list):
-    if root.left.isRealNode():
-        self.sort_rec(root.left, values_list)
-
-    values_list.append(root.value)
-
-    if root.right.isRealNode():
-        self.sort_rec(root.right, values_list)
-
-
 """ shuffles an array of n elements """
 
 
@@ -566,97 +635,3 @@ def arr_shuffle(arr):
         tmp = arr[i]  # exchange arr[i] and arr[j]
         arr[i] = arr[j]
         arr[j] = tmp
-
-
-"""permute the info values of the list 
-
-@rtype: list
-@returns: an AVLTreeList where the values are permuted randomly by the info of the original list. ##Use Randomness
-"""
-
-
-def permutation(self):
-    values = self.listToArray()
-    arr_shuffle(values)
-    n = self.size
-    new_tree = AVLTreeList()
-    new_tree.build_tree_rec(values, n)
-    return new_tree
-
-
-"""builds an AVL tree recursively from a given array"""
-
-
-def build_tree_rec(self, arr, n):
-    m = n // 2
-    self.root = AVLNode(arr(m))
-    self.root.right.build_tree_rec(arr[0:m], m)  # builds an AVL tree from the right half
-    self.root.left.build_tree_rec(arr[m + 1:n], n - m)  # builds an AVL tree from the left half
-
-
-"""switches the values from an AVL tree with the values of a given array
-0<= i < arr.length
-arr.length = self.size"""
-
-# def switch_tree_vals(self, arr, i):
-#     if self.root is not None:
-#         switch_tree_vals(self.root.getRight(), arr, i + 1)
-#         self.root.setValue(arr(i))
-#         switch_tree_vals(self.root.getLeft(), arr, i + 1)
-
-
-"""concatenates lst to self
-
-@type lst: AVLTreeList
-@param lst: a list to be concatenated after self
-@rtype: int
-@returns: the absolute value of the difference between the height of the AVL trees joined
-"""
-
-
-def concat(self, lst):
-    return None
-
-
-"""searches for a *value* in the list
-
-@type val: str
-@param val: a value to be searched
-@rtype: int
-@returns: the first index that contains val, -1 if not found.
-"""
-
-
-def search(self, val):
-    counter = [-1]
-    i = self.search_rec(self.root, val, counter)
-    return i
-
-
-def search_rec(self, root, val, counter):
-    if root.left.isRealNode():
-        i = self.search_rec(root.left, val, counter)
-        if i != -1:
-            return i
-
-    counter[0] = counter[0] + 1
-
-    if root.value == val:
-        return counter[0]
-    else:
-        if root.right.isRealNode():
-            i = self.search_rec(root.right, val, counter)
-            if i != -1:
-                return i
-    return -1
-
-
-"""returns the root of the tree representing the list
-
-@rtype: AVLNode
-@returns: the root, None if the list is empty
-"""
-
-
-def getRoot(self):
-    return self.root
