@@ -69,7 +69,12 @@ class AVLNode(object):
     def getHeight(self):
         return self.height
 
-    # todo: documentation
+    """returns the size (represents the size of the subtree rooted at self)
+
+    @rtype: int
+    @returns: the size of self, 0 if the node is virtual
+    """
+
     def getSize(self):
         return self.size
 
@@ -109,7 +114,7 @@ class AVLNode(object):
     def setValue(self, value):
         self.value = value
 
-    """sets the balance factor of the node
+    """sets the height of the node
 
     @type h: int
     @param h: the height
@@ -118,7 +123,12 @@ class AVLNode(object):
     def setHeight(self, h):
         self.height = h
 
-    # todo: documentation
+    """sets the size of the node
+
+    @type s: int
+    @param s: the size
+    """
+
     def setSize(self, s):
         self.size = s
 
@@ -141,7 +151,7 @@ class AVLNode(object):
 
     """
     Updates self size and height from its sons.
-    """  # todo documentation?
+    """
 
     def updateSizeHeight(self):
         self.size = self.left.size + self.right.size + 1
@@ -156,13 +166,10 @@ A class implementing the ADT list, using an AVL tree.
 class AVLTreeList(object):
     """
     Constructor, you are allowed to add more fields.
-
     """
 
     def __init__(self):
         self.root = None
-
-    # add your fields here
 
     """returns whether the list is empty
 
@@ -173,19 +180,31 @@ class AVLTreeList(object):
     def empty(self):
         return self.length() == 0
 
-    """retrieves the value of the i'th item in the list
+    """retrieves the value of the i-th item in the list
 
     @type i: int
     @pre: 0 <= i < self.length()
     @param i: index in the list
     @rtype: str
-    @returns: the the value of the i'th item in the list
+    @returns: the the value of the i-th item in the list
     """
 
     def retrieve(self, i):
         if i < 0 or i >= self.length():
             return None
         return self.retrieve_node_rec(self.root, i).value
+
+    """
+    Retrieves the (i+1)-th node in the subtree rooted at node.
+    
+    @type i: int
+    @param i: index of the node to retrieve (desired rank - 1)
+    @type node: AVLNode
+    @param node: the node from which we want to search
+    @pre: 1 <= i <= node.size
+    @rtype: AVLNode
+    @returns: the (i+1)-th node in the subtree rooted at node
+    """
 
     def retrieve_node_rec(self, node, i):
         if node.left.size > i:
@@ -321,7 +340,7 @@ class AVLTreeList(object):
         if B.parent is not None:
             B.parent.updateSizeHeight()
 
-    """balances the tree- there are no AVL criminals afterwards.
+    """balances the tree - there are no AVL criminals afterwards.
     @type node: AVLNode
     @param node: the first candidate to be an AVL criminal
     @returns: the number of rebalancing operation due to AVL rebalancing"""
@@ -391,7 +410,7 @@ class AVLTreeList(object):
 
         return self.tree_balance(prev_node)
 
-    """deletes the i'th item in the list
+    """deletes the i-th item in the list
 
     @type i: int
     @pre: 0 <= i < self.length()
@@ -411,30 +430,30 @@ class AVLTreeList(object):
             return 0
         to_remove = self.retrieve_node_rec(self.root, i)
         if not to_remove.getLeft().isRealNode():  # not a leaf, but has no left node
-            y = to_remove.getParent()
+            prev_node = to_remove.getParent()
             self.replace_tree(to_remove, to_remove.getRight())
         elif not to_remove.getRight().isRealNode():
-            y = to_remove.getParent()
+            prev_node = to_remove.getParent()
             self.replace_tree(to_remove, to_remove.getLeft())
         else:
             successor_node = self.successor(to_remove)
             if successor_node is not None:  # to_remove is not the last node
                 if successor_node is not to_remove.getRight():
-                    y = successor_node.getParent()
+                    prev_node = successor_node.getParent()
                     self.replace_tree(successor_node, successor_node.getRight())
                     successor_node.setRight(to_remove.getRight())
                     successor_node.getRight().setParent(successor_node)
                 else:
-                    y = successor_node
+                    prev_node = successor_node
                 self.replace_tree(to_remove, successor_node)
                 successor_node.setLeft(to_remove.getLeft())
                 successor_node.getLeft().setParent(successor_node)
                 successor_node.updateSizeHeight()
             else:  # to_remove is the last node
-                y = to_remove.getParent()
-                y.setRight(AVLNode(None))
+                prev_node = to_remove.getParent()
+                prev_node.setRight(AVLNode(None))
 
-        return self.tree_balance(y)
+        return self.tree_balance(prev_node)
 
     """replaces the subrtree rooted at node A by the subtree rooted at node B. 
     @type A: AVLNode
@@ -466,11 +485,11 @@ class AVLTreeList(object):
             while curr.getLeft().isRealNode():
                 curr = curr.getLeft()
             return curr
-        y = node.getParent()
-        while y is not None and node == y.right:
-            node = y
-            y = node.getParent()
-        return y
+        parent = node.getParent()
+        while parent is not None and node == parent.right:
+            node = parent
+            parent = node.getParent()
+        return parent
 
     """returns the value of the first item in the list
 
@@ -511,7 +530,6 @@ class AVLTreeList(object):
         fill_array_from_tree(self.root, values_list)
         return values_list
 
-
     """returns the size of the list 
 
     @rtype: int
@@ -523,9 +541,9 @@ class AVLTreeList(object):
             return 0
         return self.root.size
 
-    """sort the info values of the list
+    """sort the values of the list
 
-    @rtype: list
+    @rtype: AVLTreeList
     @returns: an AVLTreeList where the values are sorted by the info of the original list.
     """
 
@@ -537,7 +555,7 @@ class AVLTreeList(object):
 
     """permute the info values of the list 
 
-    @rtype: list
+    @rtype: AVLTreeList
     @returns: an AVLTreeList where the values are permuted randomly by the info of the original list. ##Use Randomness
     """
 
@@ -626,7 +644,22 @@ class AVLTreeList(object):
         i = self.search_rec(self.root, val, counter)
         return i
 
-    # todo: documentation
+    """
+    Find the index of the first appearance of val in the subtree of root, and return this index + counter[0].
+    counter[0] represents how many elements we searched until now
+    
+    @type root: AVLNode
+    @param root: the root of the subtree we are searching
+    @type val: str
+    @param val: the value we search for
+    @type counter: lst
+    @param counter: a list with one item representing how many nodes we visited so far
+    @pre: root.isRealNode()
+    @pre: len(counter) == 1
+    @rtype: int
+    @returns: -1 if val is not in the subtree of root, otherwise counter[0]+(first index of val in subtree of root)
+    """
+
     def search_rec(self, root, val, counter):
         if root.left.isRealNode():
             i = self.search_rec(root.left, val, counter)
@@ -652,20 +685,6 @@ class AVLTreeList(object):
 
     def getRoot(self):
         return self.root
-
-    def append(self, val):  # todo: delete after tests
-        self.insert(self.length(), val)
-
-    def getTreeHeight(self):  # todo: delete after tests
-        return self.root.height
-
-    @property
-    def firstItem(self):  # todo: delete after tests
-        self.first()
-
-    @property
-    def lastItem(self):  # todo: delete after tests
-        return self.last()
 
 
 """ merging two lists into a sorted list. A and B must be sorted. 
@@ -737,6 +756,8 @@ def arr_shuffle(arr):
 @param i: the first index from which we take elements to the tree
 @type j: int
 @param j: one more than the last index until which we take element to the tree
+@pre: i <= j
+@rtype: AVLNode
 @returns: a node which is the root of the tree
 """
 
@@ -785,6 +806,7 @@ def build_tree_from_list(arr):
 @type values_list: list
 @param values_list: the list to which we append the values
 """
+
 
 def fill_array_from_tree(node, values_list):
     if node is None or not node.isRealNode():

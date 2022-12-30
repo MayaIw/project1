@@ -15,6 +15,11 @@ DIFFERENTLY THEN YOU WILL NEED TO FIT THOSE TESTS OR COMMENT THEM.
 """
 
 
+AVLTreeList.append = lambda self, val: self.insert(self.length(), val)
+AVLTreeList.getTreeHeight = lambda self: self.root.height
+AVLTreeList.firstItem = property(lambda self: self.first())
+AVLTreeList.lstItem = property(lambda self: self.last())
+
 class testAVLList(unittest.TestCase):
     emptyList = AVLTreeList()
     twentyTree = AVLTreeList()
