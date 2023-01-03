@@ -170,6 +170,7 @@ class AVLTreeList(object):
 
     def __init__(self):
         self.root = None
+        self.size = 0
 
     """returns whether the list is empty
 
@@ -383,6 +384,7 @@ class AVLTreeList(object):
     """
 
     def insert(self, i, val):
+        self.size += 1
         new_node = AVLNode(val)
         new_node.setLeft(AVLNode(None))
         new_node.setRight(AVLNode(None))
@@ -420,7 +422,7 @@ class AVLTreeList(object):
     """
 
     def delete(self, i):
-
+        self.size -= 1
         if self.empty():
             return -1
         if i < 0 or i > self.length():
@@ -573,6 +575,7 @@ class AVLTreeList(object):
     """
 
     def concat(self, lst):
+        self.size += lst.length()
         if lst.empty():
             if self.empty():
                 return 0
@@ -796,6 +799,7 @@ def build_tree_from_list(arr):
     if len(arr) == 0:
         return tree
     tree.root = get_root_of_tree_from_list(arr, 0, len(arr))
+    tree.size = len(arr)
     return tree
 
 
