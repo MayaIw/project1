@@ -1,7 +1,8 @@
-from avl_template_new import AVLTreeList
+from AVLTreeList import AVLTreeList
 import random
 import pandas as pd
 import time
+from tqdm import tqdm
 
 class Node:
     def __init__(self, value, next=None, prev=None):
@@ -55,12 +56,15 @@ def test3(n, lst):
     return total/n
 
 ns = [1500 * i for i in range(1, 11)]
+
 for i, func in enumerate([test1, test2, test3]):
     df = pd.DataFrame({
-        'AVL': [func(n, AVLTreeList()) for n in ns],
-        'LinkedList': [func(n, LinkedList()) for n in ns],
-        'Array': [func(n, []) for n in ns]
+        'AVL': [func(n, AVLTreeList()) for n in tqdm(ns)],
+        'LinkedList': [func(n, LinkedList()) for n in tqdm(ns)],
+        'Array': [func(n, []) for n in tqdm(ns)]
     })
     df.to_csv(f'Experiment2_{i}.csv')
 
     print(df)
+
+
